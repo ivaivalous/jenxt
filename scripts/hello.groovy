@@ -1,14 +1,13 @@
 /*
-<jenxt>
+<jenxti>
 {
     "expose": "hello",
     "methods": ["GET"],
     "authentication": "passthrough",
-    "params": [
-        "name": {
-            "type": "string"
-        }
-    ]
+    "params": [{
+        "name": "name",
+        "regex": ".*"
+    }]
 }
 </jenxt>
 */

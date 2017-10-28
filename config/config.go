@@ -40,8 +40,7 @@ func LoadConfig() Configuration {
 	return parseConfiguration(configuration)
 }
 
-func parseConfiguration(rawConf []byte) Configuration {
-	var connfiguration Configuration
-	json.Unmarshal(rawConf, &connfiguration)
-	return connfiguration
+func parseConfiguration(rawConf []byte) (c Configuration) {
+	json.Unmarshal(rawConf, &c)
+	return c
 }
