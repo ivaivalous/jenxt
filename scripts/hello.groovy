@@ -1,5 +1,5 @@
 /*
-<jenxti>
+<jenxt>
 {
     "expose": "hello",
     "methods": ["GET"],

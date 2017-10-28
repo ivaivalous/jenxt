@@ -30,7 +30,7 @@ func toJson(p interface{}) string {
 	return string(bytes)
 }
 
-func LoadConfig() Configuration {
+func Load() Configuration {
 	configuration, err := ioutil.ReadFile(CONFIG_FILE)
 	if err != nil {
 		fmt.Println(err.Error())

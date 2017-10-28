@@ -7,10 +7,9 @@ import (
 )
 
 func main() {
-	var conf config.Configuration
-	conf = config.LoadConfig()
+	configuration := config.Load()
+	scripts := scripting.Load()
 
-	fmt.Println(conf.Server.Host)
-
-	scripting.GetNames()
+	fmt.Println(configuration)
+	fmt.Println(scripts)
 }

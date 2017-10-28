@@ -28,9 +28,12 @@ type Meta struct {
 		Regex string `json:"regex,omitempty"` // A regular expression the parameter must adhere to
 
 	} `json:"params,omitempty"` // Expected URL parameters
+	Script string // The content of the script
 }
 
-func GetNames() {
+func Load() map[string]Meta {
+	scripts := make(map[string]Meta)
+
 	files, err := ioutil.ReadDir(SCRIPTS_LOCATION)
 	if err != nil {
 		fmt.Println(err.Error())
@@ -52,8 +55,11 @@ func GetNames() {
 			continue
 		}
 
-		fmt.Println(fmt.Sprintf("%s", meta.Expose))
+		meta.Script = content
+		scripts[f.Name()] = meta
 	}
+
+	return scripts
 }
 
 func read(filename string) string {
