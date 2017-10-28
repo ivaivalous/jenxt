@@ -1,5 +1,6 @@
 /*
-@jenxt: {
+<jenxt>
+{
     "expose": "hello",
     "methods": ["GET"],
     "authentication": "passthrough",
@@ -9,6 +10,7 @@
         }
     ]
 }
+</jenxt>
 */
 
 println("Hello, ${name}")
