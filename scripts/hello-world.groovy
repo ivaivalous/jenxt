@@ -8,4 +8,4 @@
 </jenxt>
 */
 
-return "Hello, World!"
+return new Date().getTime()

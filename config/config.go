@@ -9,24 +9,42 @@ import (
 
 const CONFIG_FILE = "./jenxt.json"
 
+type RemoteServer struct {
+	Name        string   `json:"name"`
+	URL         string   `json:"url"`
+	Username    string   `json:"username"`
+	PasswordRaw string   `json:"password"`
+	Labels      []string `json:"labels"`
+}
+
 type Configuration struct {
 	Server struct {
 		Port       int `json:"port"`
 		HostString string
 	} `json:"server"`
-	Remotes []struct {
-		Name        string   `json:"name"`
-		URL         string   `json:"url"`
-		Username    string   `json:"username"`
-		PasswordRaw string   `json:"password"`
-		Labels      []string `json:"labels"`
-	} `json:"remotes"`
+	Remotes     []RemoteServer `json:"remotes"`
+	ServerCache map[string][]*RemoteServer
 }
 
-type RemoteServer struct {
-	URL      string
-	Username string
-	Password string
+func (c *Configuration) GetServersForLabel(label string) []*RemoteServer {
+	if c.ServerCache == nil {
+		c.ServerCache = map[string][]*RemoteServer{}
+	}
+
+	if servers, ok := c.ServerCache[label]; ok {
+		return servers
+	}
+
+	for i, s := range c.Remotes {
+		for _, serverLabel := range s.Labels {
+			if label == serverLabel {
+				c.ServerCache[label] = append(c.ServerCache[label], &c.Remotes[i])
+				break
+			}
+		}
+	}
+
+	return c.ServerCache[label]
 }
 
 func (c Configuration) toString() string {

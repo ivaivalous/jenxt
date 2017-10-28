@@ -9,7 +9,7 @@ import (
 	"strings"
 )
 
-func ExecuteOnJenkins(server config.RemoteServer, script string) (response string, err error) {
+func ExecuteOnJenkins(server *config.RemoteServer, script string) (response string, err error) {
 	crumb, err := getCrumb(server)
 	if err != nil {
 		return "", err
@@ -20,7 +20,7 @@ func ExecuteOnJenkins(server config.RemoteServer, script string) (response strin
 	req, err := http.NewRequest("POST", getURL(server.URL), strings.NewReader(form.Encode()))
 	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
 
-	req.SetBasicAuth(server.Username, server.Password)
+	req.SetBasicAuth(server.Username, server.PasswordRaw)
 	req.Header.Set("Jenkins-Crumb", crumb)
 
 	client := &http.Client{}
@@ -44,9 +44,9 @@ func getCrumbURL(baseURL string) string {
 	return baseURL + "/crumbIssuer/api/xml?xpath=//crumb"
 }
 
-func getCrumb(server config.RemoteServer) (crumb string, err error) {
+func getCrumb(server *config.RemoteServer) (crumb string, err error) {
 	req, _ := http.NewRequest("GET", getCrumbURL(server.URL), nil)
-	req.SetBasicAuth(server.Username, server.Password)
+	req.SetBasicAuth(server.Username, server.PasswordRaw)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)

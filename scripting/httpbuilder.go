@@ -6,14 +6,23 @@ import (
 	"net/http"
 )
 
-func (m Meta) GetHandler(s config.RemoteServer) (endpoint string, handler func(w http.ResponseWriter, r *http.Request)) {
+const DEFAULT_LABEL = "default"
+
+func (m Meta) GetHandler(c config.Configuration) (endpoint string, handler func(w http.ResponseWriter, r *http.Request)) {
 	return m.getEndpoint(), func(w http.ResponseWriter, r *http.Request) {
-		response, err := ExecuteOnJenkins(s, m.Script)
-		if err != nil {
-			fmt.Fprintf(w, err.Error())
+		label := DEFAULT_LABEL
+		if labelParameter := r.URL.Query().Get("label"); len(labelParameter) != 0 {
+			label = string(labelParameter)
 		}
 
-		fmt.Fprintf(w, response)
+		for _, s := range c.GetServersForLabel(label) {
+			response, err := ExecuteOnJenkins(s, m.Script)
+			if err != nil {
+				fmt.Fprintf(w, s.Name+": "+err.Error())
+			}
+
+			fmt.Fprintf(w, s.Name+": "+response)
+		}
 	}
 }
 
