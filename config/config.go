@@ -47,20 +47,6 @@ func (c *Configuration) GetServersForLabel(label string) []*RemoteServer {
 	return c.ServerCache[label]
 }
 
-func (c Configuration) toString() string {
-	return toJson(c)
-}
-
-func toJson(p interface{}) string {
-	bytes, err := json.Marshal(p)
-	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
-	}
-
-	return string(bytes)
-}
-
 func Load() Configuration {
 	configuration, err := ioutil.ReadFile(CONFIG_FILE)
 	if err != nil {
