@@ -8,4 +8,4 @@
 </jenxt>
 */
 
-println("Hello, World!")
+return "Hello, World!"

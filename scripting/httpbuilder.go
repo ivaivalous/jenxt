@@ -2,12 +2,18 @@ package scripting
 
 import (
 	"fmt"
+	"jenxt/config"
 	"net/http"
 )
 
-func (m Meta) GetHandler() (endpoint string, handler func(w http.ResponseWriter, r *http.Request)) {
+func (m Meta) GetHandler(s config.RemoteServer) (endpoint string, handler func(w http.ResponseWriter, r *http.Request)) {
 	return m.getEndpoint(), func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, m.Expose)
+		response, err := ExecuteOnJenkins(s, m.Script)
+		if err != nil {
+			fmt.Fprintf(w, err.Error())
+		}
+
+		fmt.Fprintf(w, response)
 	}
 }
 

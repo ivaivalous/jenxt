@@ -11,8 +11,14 @@ func main() {
 	conf := config.Load()
 	scripts := scripting.Load()
 
+	server := config.RemoteServer{
+		URL:      conf.Remotes[0].URL,
+		Username: conf.Remotes[0].Username,
+		Password: conf.Remotes[0].PasswordRaw,
+	}
+
 	for _, s := range scripts {
-		http.HandleFunc(s.GetHandler())
+		http.HandleFunc(s.GetHandler(server))
 		s.PrintInfo()
 	}
 

@@ -4,7 +4,7 @@
     },
     "remotes": [{
         "name": "Jenkins Production",
-        "url": "https://ivo.qa/jenkins",
+        "url": "",
         "username": "",
         "password": "REDACTED",
         "labels": ["PROD"]

@@ -23,6 +23,12 @@ type Configuration struct {
 	} `json:"remotes"`
 }
 
+type RemoteServer struct {
+	URL      string
+	Username string
+	Password string
+}
+
 func (c Configuration) toString() string {
 	return toJson(c)
 }
