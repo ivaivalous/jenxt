@@ -11,9 +11,17 @@ const CONFIG_FILE = "./jenxt.json"
 
 type Configuration struct {
 	Server struct {
-		Host string `json:"host"`
-		Port int    `json:"port"`
+		Host       string `json:"host"`
+		Port       int    `json:"port"`
+		HostString string
 	} `json:"server"`
+	Remotes []struct {
+		Name        string   `json:"name"`
+		URL         string   `json:"url"`
+		Username    string   `json:"username"`
+		PasswordRaw string   `json:"password"`
+		Labels      []string `json:"labels"`
+	} `json:"remotes"`
 }
 
 func (c Configuration) toString() string {
@@ -37,7 +45,9 @@ func Load() Configuration {
 		os.Exit(1)
 	}
 
-	return parseConfiguration(configuration)
+	conf := parseConfiguration(configuration)
+	conf.Server.HostString = fmt.Sprintf(":%d", conf.Server.Port)
+	return conf
 }
 
 func parseConfiguration(rawConf []byte) (c Configuration) {

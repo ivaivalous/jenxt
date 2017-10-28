@@ -1,6 +1,13 @@
 {
     "server": {
         "host": "127.0.0.1",
-        "port": "8899"
-    }
+        "port": 8899
+    },
+    "remotes": [{
+        "name": "Jenkins Production",
+        "url": "https://ivo.qa/jenkins",
+        "username": "",
+        "password": "REDACTED",
+        "labels": ["PROD"]
+    }]
 }
