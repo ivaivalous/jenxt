@@ -1,4 +1,4 @@
-# jenxt
+# Jenxt
 Jenkins Extender - Extend the Jenkins API with custom Groovy scripts
 
 # What is Jenxt
