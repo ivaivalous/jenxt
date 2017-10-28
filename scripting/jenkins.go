@@ -31,7 +31,7 @@ func ExecuteOnJenkins(server config.RemoteServer, script string) (response strin
 	defer resp.Body.Close()
 
 	responseBytes, _ := ioutil.ReadAll(resp.Body)
-	response = string(responseBytes)
+	response = cleanResult(string(responseBytes))
 
 	return
 }
@@ -66,4 +66,8 @@ func getCrumb(server config.RemoteServer) (crumb string, err error) {
 	crumb = strings.Replace(crumb, "</crumb>", "", 1)
 
 	return crumb, nil
+}
+
+func cleanResult(response string) string {
+	return strings.Replace(response, "Result: ", "", 1)
 }
