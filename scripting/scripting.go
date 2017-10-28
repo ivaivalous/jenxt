@@ -40,7 +40,6 @@ func Load() map[string]Meta {
 	}
 
 	for _, f := range files {
-		fmt.Println(f.Name())
 		content := read(f.Name())
 
 		metaRaw, err := extractMeta(content)

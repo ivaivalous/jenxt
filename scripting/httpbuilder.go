@@ -11,6 +11,11 @@ func (m Meta) GetHandler() (endpoint string, handler func(w http.ResponseWriter,
 	}
 }
 
+func (m Meta) PrintInfo() {
+	info := fmt.Sprintf("Registered endpoint %s", m.getEndpoint())
+	fmt.Println(info)
+}
+
 func (m Meta) getEndpoint() string {
 	return fmt.Sprintf("/%s", m.Expose)
 }

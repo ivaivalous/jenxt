@@ -11,8 +11,7 @@ const CONFIG_FILE = "./jenxt.json"
 
 type Configuration struct {
 	Server struct {
-		Host       string `json:"host"`
-		Port       int    `json:"port"`
+		Port       int `json:"port"`
 		HostString string
 	} `json:"server"`
 	Remotes []struct {

@@ -27,7 +27,6 @@ To start using Jenxt, first edit `jenxt.json`:
 ```
 {
     "server": {
-        "host": "127.0.0.1",
         "port": "8899"
     }
 }

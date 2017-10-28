@@ -8,14 +8,16 @@ import (
 )
 
 func main() {
-	configuration := config.Load()
+	conf := config.Load()
 	scripts := scripting.Load()
 
 	for _, s := range scripts {
 		http.HandleFunc(s.GetHandler())
+		s.PrintInfo()
 	}
 
-	err := http.ListenAndServe(configuration.Server.HostString, nil)
+	fmt.Println("Starting Jenxt server on port ", conf.Server.Port)
+	err := http.ListenAndServe(conf.Server.HostString, nil)
 	if err != nil {
 		fmt.Println("Server failure: ", err)
 	}
