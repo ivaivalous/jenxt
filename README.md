@@ -1,5 +1,5 @@
 # Jenxt
-Jenkins Extender - Extend the Jenkins API with custom Groovy scripts
+Jenkins API Extender - Extend the Jenkins API with custom Groovy scripts you can run en masse on your Jenkins servers.
 
 # What is Jenxt
 
