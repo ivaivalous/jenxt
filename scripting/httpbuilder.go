@@ -37,6 +37,7 @@ func (m Meta) GetHandler(c config.Configuration) (endpoint string, handler func(
 			response, err := ExecuteOnJenkins(s, m.Script)
 			if err != nil {
 				result.Results = append(result.Results, ExecutionResult{ServerName: s.Name, ResponseBody: err.Error()})
+				continue
 			}
 
 			if m.JSONResponse {
