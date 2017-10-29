@@ -10,8 +10,8 @@ import (
 const DEFAULT_LABEL = "default"
 
 type ExecutionResult struct {
-	ServerName   string `json:"server"`
-	ResponseBody string `json:"response"`
+	ServerName   string      `json:"server"`
+	ResponseBody interface{} `json:"response"`
 }
 
 type FullResult struct {
@@ -39,11 +39,23 @@ func (m Meta) GetHandler(c config.Configuration) (endpoint string, handler func(
 				result.Results = append(result.Results, ExecutionResult{ServerName: s.Name, ResponseBody: err.Error()})
 			}
 
-			result.Results = append(result.Results, ExecutionResult{ServerName: s.Name, ResponseBody: response})
+			if m.JSONResponse {
+				result.Results = append(result.Results, ExecutionResult{ServerName: s.Name, ResponseBody: convertResponseToJSON(response)})
+			} else {
+				result.Results = append(result.Results, ExecutionResult{ServerName: s.Name, ResponseBody: response})
+			}
 		}
 
 		fmt.Fprintf(w, toJson(result))
 	}
+}
+
+func convertResponseToJSON(response string) map[string]interface{} {
+	responseBytes := []byte(response)
+	var asMap map[string]interface{}
+
+	json.Unmarshal(responseBytes, &asMap)
+	return asMap
 }
 
 func (m Meta) PrintInfo() {

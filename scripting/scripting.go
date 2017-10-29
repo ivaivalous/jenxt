@@ -20,15 +20,15 @@ const (
 )
 
 type Meta struct {
-	Expose         string   `json:"expose"`            // The URL at which to expose the script
-	Methods        []string `json:"methods,omitempty"` // The HTTP methods available for the script
-	Authentication string   `json:"authentication"`    // The auth type used for the script
+	Expose         string `json:"expose"`         // The URL at which to expose the script
+	Authentication string `json:"authentication"` // The auth type used for the script
 	Params         []struct {
 		Name  string `json:"name"`            // The name of the parameter
 		Regex string `json:"regex,omitempty"` // A regular expression the parameter must adhere to
 
 	} `json:"params,omitempty"` // Expected URL parameters
-	Script string // The content of the script
+	JSONResponse bool   `json:"jsonResponse"` // Whether to return the Jenkins response as JSON or bool
+	Script       string // The content of the script
 }
 
 func Load() map[string]Meta {

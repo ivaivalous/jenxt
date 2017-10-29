@@ -69,5 +69,5 @@ func getCrumb(server *config.RemoteServer) (crumb string, err error) {
 }
 
 func cleanResult(response string) string {
-	return strings.Replace(response, "Result: ", "", 1)
+	return strings.TrimSpace(strings.Replace(response, "Result: ", "", 1))
 }

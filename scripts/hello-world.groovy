@@ -1,9 +1,7 @@
 /*
 <jenxt>
 {
-    "expose": "hello-world",
-    "methods": ["GET"],
-    "authentication": "passthrough"
+    "expose": "hello-world"
 }
 </jenxt>
 */

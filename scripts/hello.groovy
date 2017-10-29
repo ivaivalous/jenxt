@@ -2,8 +2,7 @@
 <jenxt>
 {
     "expose": "hello",
-    "methods": ["GET"],
-    "authentication": "passthrough",
+    "jsonResponse": false,
     "params": [{
         "name": "name",
         "regex": ".*"
