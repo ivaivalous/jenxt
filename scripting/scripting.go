@@ -19,6 +19,8 @@ const (
 	IGNORED_MISSING_ERR = "Ignored script %s: %s"
 )
 
+// Meta represents the system information given for configuration
+// at the beginning of every Groovy script file.
 type Meta struct {
 	Expose         string `json:"expose"`         // The URL at which to expose the script
 	Authentication string `json:"authentication"` // The auth type used for the script
@@ -31,6 +33,9 @@ type Meta struct {
 	Script       string // The content of the script
 }
 
+// Load reads all available scripts and attempts to read their
+// meta information. If parsing this information fails for a file,
+// it is ignored. A message for information is then printed to the console.
 func Load() map[string]Meta {
 	scripts := make(map[string]Meta)
 
@@ -61,6 +66,7 @@ func Load() map[string]Meta {
 	return scripts
 }
 
+// read opens a file and returns its contents as a string
 func read(filename string) string {
 	raw, err := ioutil.ReadFile(path.Join(SCRIPTS_LOCATION, filename))
 	if err != nil {
@@ -71,6 +77,7 @@ func read(filename string) string {
 	return string(raw[:])
 }
 
+// extractMeta reads a script's meta information from a Groovy script
 func extractMeta(script string) (result string, err error) {
 	re := regexp.MustCompile(META_REGEXP)
 	res := re.FindStringSubmatch(script)
@@ -84,6 +91,8 @@ func extractMeta(script string) (result string, err error) {
 	return
 }
 
+// parseMeta reads a Meta formatted string into an actual Meta object.
+// It's usually fed with the output form extractMeta.
 func parseMeta(metaRaw string) (meta Meta, err error) {
 	err = json.Unmarshal([]byte(metaRaw), &meta)
 	return meta, err

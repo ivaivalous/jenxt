@@ -16,7 +16,7 @@ func main() {
 		s.PrintInfo()
 	}
 
-	fmt.Println("Starting Jenxt server on port ", conf.Server.Port)
+	fmt.Println("Starting Jenxt server on port", conf.Server.Port)
 	err := http.ListenAndServe(conf.Server.HostString, nil)
 	if err != nil {
 		fmt.Println("Server failure: ", err)

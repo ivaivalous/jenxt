@@ -1,3 +1,4 @@
+// Package config is meant to handle the application's configuration
 package config
 
 import (
@@ -9,6 +10,7 @@ import (
 
 const CONFIG_FILE = "./jenxt.json"
 
+// RemoteServer describes a Jenkins server Jenxt can connect to
 type RemoteServer struct {
 	Name        string   `json:"name"`
 	URL         string   `json:"url"`
@@ -17,6 +19,7 @@ type RemoteServer struct {
 	Labels      []string `json:"labels"`
 }
 
+// Configuration describes the complete configuration of the Jenxt server
 type Configuration struct {
 	Server struct {
 		Port       int `json:"port"`
@@ -26,6 +29,10 @@ type Configuration struct {
 	ServerCache map[string][]*RemoteServer
 }
 
+// GetServersForLabel returns a list of pointers to all servers
+// that have been labeled with a particular label.
+// This operation utilizes a cache. The first attempt to get
+// servers for a label will be slower as the cache is built.
 func (c *Configuration) GetServersForLabel(label string) []*RemoteServer {
 	if c.ServerCache == nil {
 		c.ServerCache = map[string][]*RemoteServer{}
@@ -47,6 +54,8 @@ func (c *Configuration) GetServersForLabel(label string) []*RemoteServer {
 	return c.ServerCache[label]
 }
 
+// Load reads configuration from a file (jenxt.json)
+// and parses it into a Configuration struct
 func Load() Configuration {
 	configuration, err := ioutil.ReadFile(CONFIG_FILE)
 	if err != nil {
@@ -59,6 +68,8 @@ func Load() Configuration {
 	return conf
 }
 
+// parseConfiguration reads the contents of a configuration file
+// into a Configuration object
 func parseConfiguration(rawConf []byte) (c Configuration) {
 	json.Unmarshal(rawConf, &c)
 	return c
