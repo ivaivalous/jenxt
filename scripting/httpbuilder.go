@@ -7,7 +7,12 @@ import (
 	"net/http"
 )
 
-const DEFAULT_LABEL = "default"
+const (
+	DEFAULT_LABEL       = "default"
+	CONTENT_TYPE_HEADER = "Content-Type"
+	CT_JSON             = "application/json"
+	CT_FORM             = "application/x-www-form-urlencoded"
+)
 
 // ExecutionResult is the main element in Jenxt
 // execution responses. It lists the name of the server
@@ -16,12 +21,32 @@ const DEFAULT_LABEL = "default"
 type ExecutionResult struct {
 	ServerName   string      `json:"server"`
 	ResponseBody interface{} `json:"response"`
+	IsError      bool        `json:"error,omitempty"`
 }
 
 // FullResult describes the holder element of
 // the Jenxt execution response body.
 type FullResult struct {
 	Results []ExecutionResult `json:"results"`
+}
+
+// append adds the information of a server's response to
+// a FinalResult list of results
+func (f *FullResult) append(serverName string, response interface{}) {
+	f.Results = append(f.Results, ExecutionResult{
+		ServerName:   serverName,
+		ResponseBody: response,
+	})
+}
+
+// appendError adds the information of a server's error response to
+// a FinalResult list of results
+func (f *FullResult) appendError(serverName string, response interface{}) {
+	f.Results = append(f.Results, ExecutionResult{
+		ServerName:   serverName,
+		ResponseBody: response,
+		IsError:      true,
+	})
 }
 
 // toJson converts an arbitrary interface to a JSON string
@@ -37,7 +62,7 @@ func toJson(p interface{}) string {
 // all server responses.
 func (m Meta) GetHandler(c config.Configuration) (endpoint string, handler func(w http.ResponseWriter, r *http.Request)) {
 	return m.getEndpoint(), func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add("Content-Type", "application/json")
+		w.Header().Add(CONTENT_TYPE_HEADER, CT_JSON)
 
 		label := DEFAULT_LABEL
 		if labelParameter := r.URL.Query().Get("label"); len(labelParameter) != 0 {
@@ -48,14 +73,14 @@ func (m Meta) GetHandler(c config.Configuration) (endpoint string, handler func(
 		for _, s := range c.GetServersForLabel(label) {
 			response, err := ExecuteOnJenkins(s, m.Script)
 			if err != nil {
-				result.Results = append(result.Results, ExecutionResult{ServerName: s.Name, ResponseBody: err.Error()})
+				result.appendError(s.Name, err.Error())
 				continue
 			}
 
 			if m.JSONResponse {
-				result.Results = append(result.Results, ExecutionResult{ServerName: s.Name, ResponseBody: convertResponseToJSON(response)})
+				result.append(s.Name, convertResponseToJSON(response))
 			} else {
-				result.Results = append(result.Results, ExecutionResult{ServerName: s.Name, ResponseBody: response})
+				result.append(s.Name, response)
 			}
 		}
 

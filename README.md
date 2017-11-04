@@ -99,6 +99,18 @@ Running the script from the above example against two machines yields a response
 }
 ```
 
+If there was an error in executing the script, it will be restured in the `response` field, too. Additionally, there will be an `error` fiels with the value of `true`. Like:
+
+```
+{
+  "results": [{
+    "server": "Jenkins Server in Pune",
+    "response": "Authentication failed",
+    "error":true
+  }]
+}
+```
+
 And if we have the below, more complex script, giving us the SCM configuration for all jobs that have one,
 
 ```
@@ -159,7 +171,6 @@ The result would resamble this:
 
 # Roadmap
 
- - Comments :)
  - Unit tests :) :)
  - Parameters in requests
  - Request parameters and body validation

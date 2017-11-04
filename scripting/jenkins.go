@@ -22,7 +22,7 @@ func ExecuteOnJenkins(server *config.RemoteServer, script string) (response stri
 	form := url.Values{}
 	form.Add("script", script)
 	req, err := http.NewRequest("POST", getURL(server.URL), strings.NewReader(form.Encode()))
-	req.Header.Add("Content-Type", "application/x-www-form-urlencoded")
+	req.Header.Add(CONTENT_TYPE_HEADER, CT_FORM)
 
 	req.SetBasicAuth(server.Username, server.PasswordRaw)
 	req.Header.Set("Jenkins-Crumb", crumb)
