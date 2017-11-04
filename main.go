@@ -11,6 +11,8 @@ func main() {
 	conf := config.Load()
 	scripts := scripting.Load()
 
+	go scripting.FileWatch(scripts)
+
 	for _, s := range scripts {
 		http.HandleFunc(s.GetHandler(conf))
 		s.PrintInfo()

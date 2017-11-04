@@ -106,7 +106,7 @@ If there was an error in executing the script, it will be restured in the `respo
   "results": [{
     "server": "Jenkins Server in Pune",
     "response": "Authentication failed",
-    "error":true
+    "error": true
   }]
 }
 ```

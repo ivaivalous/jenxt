@@ -5,18 +5,20 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"os"
+	"jenxt/config"
 	"path"
 	"regexp"
 	"strings"
+	"time"
 )
 
 const (
-	SCRIPTS_LOCATION    = "./scripts"
-	META_REGEXP         = "<jenxt>(?P<Meta>[\\S\\s]*)</jenxt>"
-	MISSING_META_ERR    = "Invalid script - Meta is missing"
-	BAD_META_ERR        = "Ignored script %s: Meta is malformed: %s"
-	IGNORED_MISSING_ERR = "Ignored script %s: %s"
+	FILE_WATCH_INTERVAL_S = 10
+	SCRIPTS_LOCATION      = "./scripts"
+	META_REGEXP           = "<jenxt>(?P<Meta>[\\S\\s]*)</jenxt>"
+	MISSING_META_ERR      = "Invalid script - Meta is missing"
+	BAD_META_ERR          = "Ignored script %s: Meta is malformed: %s"
+	IGNORED_MISSING_ERR   = "Ignored script %s: %s"
 )
 
 // Meta represents the system information given for configuration
@@ -31,50 +33,106 @@ type Meta struct {
 	} `json:"params,omitempty"` // Expected URL parameters
 	JSONResponse bool   `json:"jsonResponse"` // Whether to return the Jenkins response as JSON or bool
 	Script       string // The content of the script
+	Hash         string // A hash of the file's contents
+	FileName     string // The name of the file the script was loaded from
 }
 
 // Load reads all available scripts and attempts to read their
 // meta information. If parsing this information fails for a file,
 // it is ignored. A message for information is then printed to the console.
-func Load() map[string]Meta {
-	scripts := make(map[string]Meta)
+func Load() map[string]*Meta {
+	scripts := make(map[string]*Meta)
 
 	files, err := ioutil.ReadDir(SCRIPTS_LOCATION)
 	if err != nil {
 		fmt.Println(err.Error())
+		return scripts
 	}
 
 	for _, f := range files {
-		content := read(f.Name())
-
-		metaRaw, err := extractMeta(content)
-		if err != nil {
-			fmt.Println(fmt.Sprintf(IGNORED_MISSING_ERR, f.Name(), err.Error()))
-			continue
-		}
-
-		meta, err := parseMeta(metaRaw)
+		meta, err := LoadFile(f.Name())
 		if err != nil {
 			fmt.Println(fmt.Sprintf(BAD_META_ERR, f.Name(), err.Error()))
 			continue
 		}
 
-		meta.Script = content
-		scripts[f.Name()] = meta
+		scripts[f.Name()] = &meta
 	}
 
 	return scripts
 }
 
-// read opens a file and returns its contents as a string
-func read(filename string) string {
-	raw, err := ioutil.ReadFile(path.Join(SCRIPTS_LOCATION, filename))
+// Reload reads through loaded scripts and reloads ones that
+// have been changed on disk.
+func Reload(currentScripts map[string]*Meta) {
+	for name, meta := range currentScripts {
+		content, err := read(meta.FileName)
+		if err != nil {
+			fmt.Println("Could not load file", meta.FileName)
+			continue
+		}
+
+		hash := config.GetFileHash(content)
+
+		if hash != meta.Hash {
+			newMeta, err := LoadContent(meta.FileName, content)
+			if err != nil {
+				fmt.Println("Change detected for", meta.FileName, "but reload failed")
+				continue
+			}
+
+			currentScripts[name] = &newMeta
+			fmt.Println("Script", meta.FileName, "updated due to file change")
+		}
+	}
+}
+
+// LoadFile reads and parses a script file
+func LoadFile(filename string) (meta Meta, err error) {
+	content, err := read(filename)
 	if err != nil {
-		fmt.Println(err.Error())
-		os.Exit(1)
+		return
 	}
 
-	return string(raw[:])
+	return LoadContent(filename, content)
+}
+
+// LoadContent parses a string into a Meta object
+func LoadContent(filename, content string) (meta Meta, err error) {
+	metaRaw, err := extractMeta(content)
+	if err != nil {
+		return
+	}
+
+	meta, err = parseMeta(metaRaw)
+	if err != nil {
+		return
+	}
+
+	meta.Script = content
+	meta.Hash = config.GetFileHash(content)
+	meta.FileName = filename
+
+	return
+}
+
+// FileWatch runs forever, checking for sript file
+// changes. It should be called as a goroutine.
+func FileWatch(scripts map[string]*Meta) {
+	for {
+		Reload(scripts)
+		time.Sleep(FILE_WATCH_INTERVAL_S * time.Second)
+	}
+}
+
+// read opens a file and returns its contents as a string
+func read(filename string) (content string, err error) {
+	raw, err := ioutil.ReadFile(path.Join(SCRIPTS_LOCATION, filename))
+	if err != nil {
+		return
+	}
+
+	return string(raw[:]), nil
 }
 
 // extractMeta reads a script's meta information from a Groovy script
