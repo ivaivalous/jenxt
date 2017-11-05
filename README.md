@@ -57,7 +57,7 @@ Finally, there is the `labels` list that allows you to group your servers. You c
 
 Groovy scripts you create go in the `scripts` directory. The repository contains some scripts for example purposes that you can safely delete. To enable a script, you just have to place it in the folder. Please only put Groovy scripts in there as Jentx will try to register any file it finds in the directory.
 
-**Note**: Scripts and configuration are only read once at application start-up. If you change or add a script, you need to restart the Jenxt server. This will change in future releases.
+You can add, change or remove scripts without restarting Jenxt. Checks for changes are run every ten seconds. This should allow you to just run the server somewhere and sync it though your version control system.
 
 A script looks like this:
 
@@ -174,7 +174,7 @@ The result would resamble this:
  - Unit tests :) :)
  - Parameters in requests
  - Request parameters and body validation
- - Automatic pick up of configuration and script changes
+ - DONE - Automatic pick up of configuration and script changes
  - Authentication of requests to Jenxt
  - Password encryption
  - CI
