@@ -9,7 +9,10 @@ import (
 
 func main() {
 	conf := config.Load()
-	scripts := scripting.Load()
+	scripts := scripting.Scripts{}
+	scripts.Load()
+
+	go scripting.FileWatch(&scripts)
 
 	for _, s := range scripts {
 		http.HandleFunc(s.GetHandler(conf))

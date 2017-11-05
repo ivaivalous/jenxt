@@ -37,54 +37,59 @@ type Meta struct {
 	FileName     string // The name of the file the script was loaded from
 }
 
+type Scripts map[string]Meta
+
 // Load reads all available scripts and attempts to read their
 // meta information. If parsing this information fails for a file,
 // it is ignored. A message for information is then printed to the console.
-func Load() map[string]*Meta {
-	scripts := make(map[string]*Meta)
+func (currentScripts *Scripts) Load() (reloadNeeded bool) {
+	newScripts := Scripts{}
 
 	files, err := ioutil.ReadDir(SCRIPTS_LOCATION)
 	if err != nil {
 		fmt.Println(err.Error())
-		return scripts
+		return len(*currentScripts) != 0
 	}
 
 	for _, f := range files {
-		meta, err := LoadFile(f.Name())
+		content, err := read(f.Name())
 		if err != nil {
-			fmt.Println(fmt.Sprintf(BAD_META_ERR, f.Name(), err.Error()))
+			fmt.Println("File", f.Name(), "could not be read. Removing.")
+			reloadNeeded = true
 			continue
 		}
 
-		scripts[f.Name()] = &meta
-	}
+		// File has already been loaded, check for updates
+		if existingMeta, ok := (*currentScripts)[f.Name()]; ok {
+			if config.GetFileHash(content) != existingMeta.Hash {
+				newMeta, err := LoadContent(existingMeta.FileName, content)
+				if err != nil {
+					fmt.Println("Change detected for", existingMeta.FileName, "but reload failed")
+					continue
+				}
 
-	return scripts
-}
+				fmt.Println("Script", existingMeta.FileName, "updated due to file change")
 
-// Reload reads through loaded scripts and reloads ones that
-// have been changed on disk.
-func Reload(currentScripts map[string]*Meta) {
-	for name, meta := range currentScripts {
-		content, err := read(meta.FileName)
-		if err != nil {
-			fmt.Println("Could not load file", meta.FileName)
-			continue
-		}
-
-		hash := config.GetFileHash(content)
-
-		if hash != meta.Hash {
-			newMeta, err := LoadContent(meta.FileName, content)
+				newScripts[f.Name()] = newMeta
+				reloadNeeded = true
+			} else {
+				newScripts[f.Name()] = existingMeta
+			}
+		} else {
+			// New file
+			meta, err := LoadContent(f.Name(), content)
 			if err != nil {
-				fmt.Println("Change detected for", meta.FileName, "but reload failed")
+				fmt.Println("Could not load", meta.FileName)
 				continue
 			}
 
-			currentScripts[name] = &newMeta
-			fmt.Println("Script", meta.FileName, "updated due to file change")
+			newScripts[f.Name()] = meta
+			reloadNeeded = true
 		}
 	}
+
+	*currentScripts = newScripts
+	return
 }
 
 // LoadFile reads and parses a script file
@@ -118,9 +123,13 @@ func LoadContent(filename, content string) (meta Meta, err error) {
 
 // FileWatch runs forever, checking for sript file
 // changes. It should be called as a goroutine.
-func FileWatch(scripts map[string]*Meta) {
+func FileWatch(scripts *Scripts) {
 	for {
-		Reload(scripts)
+		changeNeeded := scripts.Load()
+		if changeNeeded {
+			fmt.Println("Triggering server reload")
+		}
+
 		time.Sleep(FILE_WATCH_INTERVAL_S * time.Second)
 	}
 }
