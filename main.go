@@ -14,10 +14,7 @@ func main() {
 
 	go scripting.FileWatch(&scripts)
 
-	for _, s := range scripts {
-		http.HandleFunc(s.GetHandler(conf))
-		s.PrintInfo()
-	}
+	http.HandleFunc("/", scripting.GetHandler(conf, &scripts))
 
 	fmt.Println("Starting Jenxt server on port", conf.Server.Port)
 	err := http.ListenAndServe(conf.Server.HostString, nil)
