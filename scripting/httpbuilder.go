@@ -55,13 +55,15 @@ func toJson(p interface{}) string {
 	return string(bytes)
 }
 
+// GetHandler runs a handler dynamically based on the requested path
 func GetHandler(c config.Configuration, scripts *Scripts) func(w http.ResponseWriter, r *http.Request) {
 	return func(w http.ResponseWriter, r *http.Request) {
-		GetHandlerByPath(c, r.URL.Path, scripts)(w, r)
+		GenerateHandler(c, r.URL.Path, scripts)(w, r)
 	}
 }
 
-func GetHandlerByPath(c config.Configuration, path string, scripts *Scripts) func(w http.ResponseWriter, r *http.Request) {
+// GenerateHandler generates a handler dynamically based on the requested path
+func GenerateHandler(c config.Configuration, path string, scripts *Scripts) func(w http.ResponseWriter, r *http.Request) {
 	if script, ok := getScriptByPath(path, scripts); ok {
 		return func(w http.ResponseWriter, r *http.Request) {
 			w.Header().Add(CONTENT_TYPE_HEADER, CT_JSON)
@@ -95,7 +97,10 @@ func GetHandlerByPath(c config.Configuration, path string, scripts *Scripts) fun
 	}
 }
 
+// getScriptByPath gets the script matching a requested path.
+// If no matching script could be found, ok will be false.
 func getScriptByPath(path string, scripts *Scripts) (meta Meta, ok bool) {
+	// This should be improved with some memorization
 	for _, script := range *scripts {
 		if script.getEndpoint() == path {
 			return script, true
