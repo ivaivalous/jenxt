@@ -55,37 +55,59 @@ func toJson(p interface{}) string {
 	return string(bytes)
 }
 
-// GetHandler builds a function that can be passed to http.HandleFunc.
-// This creates the endpoints users can access.
-// When the returned function is called, an HTTP request is made to
-// the required Jenkins servers and a response is built listing
-// all server responses.
-func (m Meta) GetHandler(c config.Configuration) (endpoint string, handler func(w http.ResponseWriter, r *http.Request)) {
-	return m.getEndpoint(), func(w http.ResponseWriter, r *http.Request) {
-		w.Header().Add(CONTENT_TYPE_HEADER, CT_JSON)
-
-		label := DEFAULT_LABEL
-		if labelParameter := r.URL.Query().Get("label"); len(labelParameter) != 0 {
-			label = string(labelParameter)
-		}
-
-		result := FullResult{}
-		for _, s := range c.GetServersForLabel(label) {
-			response, err := ExecuteOnJenkins(s, m.Script)
-			if err != nil {
-				result.appendError(s.Name, err.Error())
-				continue
-			}
-
-			if m.JSONResponse {
-				result.append(s.Name, convertResponseToJSON(response))
-			} else {
-				result.append(s.Name, response)
-			}
-		}
-
-		fmt.Fprintf(w, toJson(result))
+// GetHandler runs a handler dynamically based on the requested path
+func GetHandler(c config.Configuration, scripts *Scripts) func(w http.ResponseWriter, r *http.Request) {
+	return func(w http.ResponseWriter, r *http.Request) {
+		GenerateHandler(c, r.URL.Path, scripts)(w, r)
 	}
+}
+
+// GenerateHandler generates a handler dynamically based on the requested path
+func GenerateHandler(c config.Configuration, path string, scripts *Scripts) func(w http.ResponseWriter, r *http.Request) {
+	if script, ok := getScriptByPath(path, scripts); ok {
+		return func(w http.ResponseWriter, r *http.Request) {
+			w.Header().Add(CONTENT_TYPE_HEADER, CT_JSON)
+
+			label := DEFAULT_LABEL
+			if labelParameter := r.URL.Query().Get("label"); len(labelParameter) != 0 {
+				label = string(labelParameter)
+			}
+
+			result := FullResult{}
+			for _, s := range c.GetServersForLabel(label) {
+				response, err := ExecuteOnJenkins(s, script.Script)
+				if err != nil {
+					result.appendError(s.Name, err.Error())
+					continue
+				}
+
+				if script.JSONResponse {
+					result.append(s.Name, convertResponseToJSON(response))
+				} else {
+					result.append(s.Name, response)
+				}
+			}
+
+			fmt.Fprintf(w, toJson(result))
+		}
+	}
+
+	return func(w http.ResponseWriter, r *http.Request) {
+		fmt.Fprintf(w, "404")
+	}
+}
+
+// getScriptByPath gets the script matching a requested path.
+// If no matching script could be found, ok will be false.
+func getScriptByPath(path string, scripts *Scripts) (meta Meta, ok bool) {
+	// This should be improved with some memorization
+	for _, script := range *scripts {
+		if script.getEndpoint() == path {
+			return script, true
+		}
+	}
+
+	return Meta{}, false
 }
 
 // convertResponseToJSON builds a map out or an arbitrary JSON-formatted

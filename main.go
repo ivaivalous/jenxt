@@ -9,12 +9,10 @@ import (
 
 func main() {
 	conf := config.Load()
-	scripts := scripting.Load()
+	scripts := scripting.Scripts{}
 
-	for _, s := range scripts {
-		http.HandleFunc(s.GetHandler(conf))
-		s.PrintInfo()
-	}
+	http.HandleFunc("/", scripting.GetHandler(conf, &scripts))
+	go scripting.FileWatch(&scripts)
 
 	fmt.Println("Starting Jenxt server on port", conf.Server.Port)
 	err := http.ListenAndServe(conf.Server.HostString, nil)
