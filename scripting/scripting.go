@@ -62,31 +62,32 @@ func (currentScripts *Scripts) Load() {
 		if existingMeta, ok := (*currentScripts)[f.Name()]; ok {
 			if config.GetFileHash(content) == existingMeta.Hash {
 				newScripts[f.Name()] = existingMeta
-			} else {
-				newMeta, err := LoadContent(existingMeta.FileName, content)
-				if err != nil {
-					fmt.Println("Change detected for", existingMeta.getEndpoint(), "but reload failed")
-					continue
-				}
-
-				fmt.Println("Resource", existingMeta.getEndpoint(), "reloaded due to file change")
-				newScripts[f.Name()] = newMeta
-			}
-		} else {
-			// New file
-			meta, err := LoadContent(f.Name(), content)
-			if err != nil {
-				fmt.Println("Could not load", meta.FileName)
 				continue
 			}
 
-			meta.PrintInfo()
-			newScripts[f.Name()] = meta
+			newMeta, err := LoadContent(existingMeta.FileName, content)
+			if err != nil {
+				fmt.Println("Change detected for", existingMeta.getEndpoint(), "but reload failed")
+				continue
+			}
+
+			fmt.Println("Resource", existingMeta.getEndpoint(), "reloaded due to file change")
+			newScripts[f.Name()] = newMeta
+			continue
 		}
+
+		// New file
+		meta, err := LoadContent(f.Name(), content)
+		if err != nil {
+			fmt.Println("Could not load", meta.FileName)
+			continue
+		}
+
+		meta.PrintInfo()
+		newScripts[f.Name()] = meta
 	}
 
 	*currentScripts = newScripts
-	return
 }
 
 // LoadFile reads and parses a script file
