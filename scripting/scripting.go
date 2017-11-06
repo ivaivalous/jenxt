@@ -42,38 +42,35 @@ type Scripts map[string]Meta
 // Load reads all available scripts and attempts to read their
 // meta information. If parsing this information fails for a file,
 // it is ignored. A message for information is then printed to the console.
-func (currentScripts *Scripts) Load() (reloadNeeded bool) {
+func (currentScripts *Scripts) Load() {
 	newScripts := Scripts{}
 
 	files, err := ioutil.ReadDir(SCRIPTS_LOCATION)
 	if err != nil {
 		fmt.Println(err.Error())
-		return len(*currentScripts) != 0
+		return
 	}
 
 	for _, f := range files {
 		content, err := read(f.Name())
 		if err != nil {
 			fmt.Println("File", f.Name(), "could not be read. Removing.")
-			reloadNeeded = true
 			continue
 		}
 
 		// File has already been loaded, check for updates
 		if existingMeta, ok := (*currentScripts)[f.Name()]; ok {
-			if config.GetFileHash(content) != existingMeta.Hash {
+			if config.GetFileHash(content) == existingMeta.Hash {
+				newScripts[f.Name()] = existingMeta
+			} else {
 				newMeta, err := LoadContent(existingMeta.FileName, content)
 				if err != nil {
-					fmt.Println("Change detected for", existingMeta.FileName, "but reload failed")
+					fmt.Println("Change detected for", existingMeta.getEndpoint(), "but reload failed")
 					continue
 				}
 
-				fmt.Println("Script", existingMeta.FileName, "updated due to file change")
-
+				fmt.Println("Resource", existingMeta.getEndpoint(), "reloaded due to file change")
 				newScripts[f.Name()] = newMeta
-				reloadNeeded = true
-			} else {
-				newScripts[f.Name()] = existingMeta
 			}
 		} else {
 			// New file
@@ -83,8 +80,8 @@ func (currentScripts *Scripts) Load() (reloadNeeded bool) {
 				continue
 			}
 
+			meta.PrintInfo()
 			newScripts[f.Name()] = meta
-			reloadNeeded = true
 		}
 	}
 
@@ -125,11 +122,7 @@ func LoadContent(filename, content string) (meta Meta, err error) {
 // changes. It should be called as a goroutine.
 func FileWatch(scripts *Scripts) {
 	for {
-		changeNeeded := scripts.Load()
-		if changeNeeded {
-			fmt.Println("Triggering server reload")
-		}
-
+		scripts.Load()
 		time.Sleep(FILE_WATCH_INTERVAL_S * time.Second)
 	}
 }
