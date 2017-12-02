@@ -8,10 +8,10 @@ import (
 )
 
 const (
-	DEFAULT_LABEL       = "default"
-	CONTENT_TYPE_HEADER = "Content-Type"
-	CT_JSON             = "application/json"
-	CT_FORM             = "application/x-www-form-urlencoded"
+	DefaultLabel      = "default"
+	ContentTypeHeader = "Content-Type"
+	ContentTypeJSON   = "application/json"
+	ContentTypeForm   = "application/x-www-form-urlencoded"
 )
 
 // ExecutionResult is the main element in Jenxt
@@ -66,9 +66,9 @@ func GetHandler(c config.Configuration, scripts *Scripts) func(w http.ResponseWr
 func GenerateHandler(c config.Configuration, path string, scripts *Scripts) func(w http.ResponseWriter, r *http.Request) {
 	if script, ok := getScriptByPath(path, scripts); ok {
 		return func(w http.ResponseWriter, r *http.Request) {
-			w.Header().Add(CONTENT_TYPE_HEADER, CT_JSON)
+			w.Header().Add(ContentTypeHeader, ContentTypeJSON)
 
-			label := DEFAULT_LABEL
+			label := DefaultLabel
 			if labelParameter := r.URL.Query().Get("label"); len(labelParameter) != 0 {
 				label = string(labelParameter)
 			}

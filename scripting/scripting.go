@@ -13,12 +13,10 @@ import (
 )
 
 const (
-	FILE_WATCH_INTERVAL_S = 10
-	SCRIPTS_LOCATION      = "./scripts"
-	META_REGEXP           = "<jenxt>(?P<Meta>[\\S\\s]*)</jenxt>"
-	MISSING_META_ERR      = "Invalid script - Meta is missing"
-	BAD_META_ERR          = "Ignored script %s: Meta is malformed: %s"
-	IGNORED_MISSING_ERR   = "Ignored script %s: %s"
+	FileWatchIntervalSeconds  = 10
+	ScriptsLocation           = "./scripts"
+	MetaRegexp                = "<jenxt>(?P<Meta>[\\S\\s]*)</jenxt>"
+	MissingMetaError          = "invalid script - Meta is missing"
 )
 
 // Meta represents the system information given for configuration
@@ -45,7 +43,7 @@ type Scripts map[string]Meta
 func (currentScripts *Scripts) Load() {
 	newScripts := Scripts{}
 
-	files, err := ioutil.ReadDir(SCRIPTS_LOCATION)
+	files, err := ioutil.ReadDir(ScriptsLocation)
 	if err != nil {
 		fmt.Println(err.Error())
 		return
@@ -90,16 +88,6 @@ func (currentScripts *Scripts) Load() {
 	*currentScripts = newScripts
 }
 
-// LoadFile reads and parses a script file
-func LoadFile(filename string) (meta Meta, err error) {
-	content, err := read(filename)
-	if err != nil {
-		return
-	}
-
-	return LoadContent(filename, content)
-}
-
 // LoadContent parses a string into a Meta object
 func LoadContent(filename, content string) (meta Meta, err error) {
 	metaRaw, err := extractMeta(content)
@@ -124,13 +112,13 @@ func LoadContent(filename, content string) (meta Meta, err error) {
 func FileWatch(scripts *Scripts) {
 	for {
 		scripts.Load()
-		time.Sleep(FILE_WATCH_INTERVAL_S * time.Second)
+		time.Sleep(FileWatchIntervalSeconds * time.Second)
 	}
 }
 
 // read opens a file and returns its contents as a string
 func read(filename string) (content string, err error) {
-	raw, err := ioutil.ReadFile(path.Join(SCRIPTS_LOCATION, filename))
+	raw, err := ioutil.ReadFile(path.Join(ScriptsLocation, filename))
 	if err != nil {
 		return
 	}
@@ -140,11 +128,11 @@ func read(filename string) (content string, err error) {
 
 // extractMeta reads a script's meta information from a Groovy script
 func extractMeta(script string) (result string, err error) {
-	re := regexp.MustCompile(META_REGEXP)
+	re := regexp.MustCompile(MetaRegexp)
 	res := re.FindStringSubmatch(script)
 
 	if len(res) != 2 {
-		err = errors.New(MISSING_META_ERR)
+		err = errors.New(MissingMetaError)
 		return
 	}
 

@@ -8,7 +8,7 @@ import (
 	"os"
 )
 
-const CONFIG_FILE = "./jenxt.json"
+const SettingsFile = "./jenxt.json"
 
 // RemoteServer describes a Jenkins server Jenxt can connect to
 type RemoteServer struct {
@@ -57,7 +57,7 @@ func (c *Configuration) GetServersForLabel(label string) []*RemoteServer {
 // Load reads configuration from a file (jenxt.json)
 // and parses it into a Configuration struct
 func Load() Configuration {
-	configuration, err := ioutil.ReadFile(CONFIG_FILE)
+	configuration, err := ioutil.ReadFile(SettingsFile)
 	if err != nil {
 		fmt.Println(err.Error())
 		os.Exit(1)

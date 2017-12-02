@@ -22,7 +22,7 @@ func ExecuteOnJenkins(server *config.RemoteServer, script string) (response stri
 	form := url.Values{}
 	form.Add("script", script)
 	req, err := http.NewRequest("POST", getURL(server.URL), strings.NewReader(form.Encode()))
-	req.Header.Add(CONTENT_TYPE_HEADER, CT_FORM)
+	req.Header.Add(ContentTypeHeader, ContentTypeForm)
 
 	req.SetBasicAuth(server.Username, server.PasswordRaw)
 	req.Header.Set("Jenkins-Crumb", crumb)
@@ -67,7 +67,7 @@ func getCrumb(server *config.RemoteServer) (crumb string, err error) {
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
-		err = errors.New("Authentication failed")
+		err = errors.New("authentication failed")
 		return
 	}
 
