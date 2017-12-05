@@ -49,7 +49,35 @@ Under server > port, you can change the port where the server is started. Use `r
 
 `name` is a descriptive name for the server, like "Jenkins Production Server". This name will be returned in responses so you know how each server responded to your request. In `url` you specify the full address of your Jenkins server. `username` and `password` are the credentials of a user who has the permission to run Groovy scripts.
 
-**Note**: Passwords are currently stored in plain text, but it is on the project roadmap to offer encryption.
+To avert the risk of committing your passwords to version control by mistake, you can separate passwords from the rest of the configuration. Simply remove the passwords from the configuration file so that it looks like this:
+
+```
+...
+{
+    "name": "Jenkins Server in Paris",
+    "url": "https://ci2.example.com",
+    "username": "user",
+    "labels": ["default", "Europe"]
+}
+...
+```
+
+And then create a new JSON file with a name of your choice, with the following structure:
+
+```
+{
+    "remotes": [{
+        "name": "Jenkins Server in Paris",
+        "password": "YouR Pa$$w0RD"
+    }]
+}
+```
+
+The configuration and secrets file can be stored anywhere on the file system your program can access, and you can give it the location by running it with two arguments:
+
+```
+./jenxt <path to jenxt.json> <path to secrets.json>
+```
 
 Finally, there is the `labels` list that allows you to group your servers. You can use this to enable executing scripts only for the groups you'd like. If you want to store a server but never execute any scripts on it, you can just not set any labels for it.
 
