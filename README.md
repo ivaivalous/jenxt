@@ -79,7 +79,7 @@ The configuration and secrets file can be stored anywhere on the file system you
 ./jenxt <path to jenxt.json> <path to secrets.json>
 ```
 
-Finally, there is the `labels` list that allows you to group your servers. You can use this to enable executing scripts only for the groups you'd like. If you want to store a server but never execute any scripts on it, you can just not set any labels for it.
+The last component of the config file is the `labels` list that allows you to group your servers. You can use this to enable executing scripts only for the groups you'd like. If you want to store a server but never execute any scripts on it, you can just not set any labels for it.
 
 # Creating scripts
 
