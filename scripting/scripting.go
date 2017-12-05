@@ -13,10 +13,10 @@ import (
 )
 
 const (
-	FileWatchIntervalSeconds  = 10
-	ScriptsLocation           = "./scripts"
-	MetaRegexp                = "<jenxt>(?P<Meta>[\\S\\s]*)</jenxt>"
-	MissingMetaError          = "invalid script - Meta is missing"
+	FileWatchIntervalSeconds = 10
+	ScriptsLocation          = "./scripts"
+	MetaRegexp               = "<jenxt>(?P<Meta>[\\S\\s]*)</jenxt>"
+	MissingMetaError         = "invalid script - Meta is missing"
 )
 
 // Meta represents the system information given for configuration

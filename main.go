@@ -8,7 +8,7 @@ import (
 )
 
 func main() {
-	conf := config.Load()
+	conf := config.LoadDynamic()
 	scripts := scripting.Scripts{}
 
 	http.HandleFunc("/", scripting.GetHandler(conf, &scripts))

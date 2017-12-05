@@ -4,9 +4,8 @@
     },
     "remotes": [{
         "name": "Jenkins Production",
-        "url": "",
-        "username": "",
-        "password": "REDACTED",
-        "labels": ["PROD"]
+        "url": "https://ci.example.com",
+        "username": "user",
+        "labels": ["default"]
     }]
 }
