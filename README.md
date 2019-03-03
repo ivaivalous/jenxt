@@ -1,9 +1,9 @@
 # Jenxt
-Jenkins API Extender - Extend the Jenkins API with custom Groovy scripts you can run en masse on your Jenkins servers.
+Jenkins API Extender—Extend the Jenkins API with custom Groovy scripts you can run en masse on your Jenkins servers.
 
 # What is Jenxt
 
-Jenxt acts as a web server, written in go, that lets you easily extend the Jenkins API through Groovy scripts. In a nutshell, it executes Groovy against Jenkins' script console, which gives you full control over Jenkins to make your automation tasks easier.
+Jenxt acts as a web server, written in Go, that lets you easily extend the Jenkins API through Groovy scripts. In a nutshell, it executes Groovy against Jenkins' script console, which gives you full control over Jenkins to make your automation tasks easier.
 
 Normally, it is dangerous to let users run arbitrary scripts as they might take actions that are malicious. With Jenxt, the content of the script is abstracted away from the user and they can't view or modify it. They can only execute it, passing in parameters, and retrieving a response. User requests to Jenxt can be validated.
 
@@ -20,7 +20,7 @@ scripts
 `jenxt` is the main executable. It starts the server and listens for incoming requests.
 `jenxt.json` is the file where you configure the system. `scripts` contains all your user scripts.
 
-To use Jenxt, you simply create Groovy scripts and place them in the scripts directory. Scripts are normal Groovy Jenkins would understand, with some special annotations to register them with the Jenxt server. You'll learn about this later.
+To use Jenxt, simply create Groovy scripts and place them in the scripts directory. Scripts are normal Groovy Jenkins would understand, with some special annotations to register them with the Jenxt server. You'll learn about this later.
 
 To start using Jenxt, first edit `jenxt.json`:
 
@@ -101,7 +101,7 @@ A script looks like this:
 return new Date().getTime()
 ```
 
-Wrapped in `<jenxt>...</jenxt>` is the so called meta of the script. It instructs Jenxt how to run the script. Inside is a simple JSON object that may currently contain the following settings:
+Wrapped in `<jenxt>...</jenxt>` is the so-called meta of the script. It instructs Jenxt how to run the script. Inside is a simple JSON object that may currently contain the following settings:
 
  - `expose` - this is the endpoint one needs to access so they can run the script. In the above example, an HTTP request to `http://127.0.0.1:8899/epoch-time` will run the given script against the configured Jenkins instances that have the "default" label. To execute against instances labelled "XYZ", add a `label` parameter to the request, like in `http://127.0.0.1:8899/epoch-time?label=XYZ`.
   - `jsonResponse` - Set this to false or omit to get Jenkins' response as a string. Set it to true to return a JSON. *Note*: if jsonResponse is `true` and the response can't be converted to a JSON (for example, when it is a normal string), the response will be returned as `null`.
