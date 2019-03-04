@@ -1,4 +1,4 @@
-package scripting
+package scripting /* import "ivo.qa/jenxt/scripting" */
 
 import (
 	"encoding/json"
