@@ -3,7 +3,7 @@ package scripting /* import "ivo.qa/jenxt/scripting" */
 import (
 	"encoding/json"
 	"fmt"
-	"jenxt/config"
+	"ivo.qa/jenxt/config"
 	"net/http"
 )
 
