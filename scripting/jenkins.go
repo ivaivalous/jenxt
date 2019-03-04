@@ -3,7 +3,7 @@ package scripting /* import "ivo.qa/jenxt/scripting" */
 import (
 	"errors"
 	"io/ioutil"
-	"jenxt/config"
+	"ivo.qa/jenxt/config"
 	"net/http"
 	"net/url"
 	"strings"
