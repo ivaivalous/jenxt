@@ -2,8 +2,8 @@ package main /* import "ivo.qa/jenxt" */
 
 import (
 	"fmt"
-	"jenxt/config"
-	"jenxt/scripting"
+	"ivo.qa/jenxt/config"
+	"ivo.qa/jenxt/scripting"
 	"net/http"
 )
 
