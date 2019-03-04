@@ -1,5 +1,5 @@
 // Package config is meant to handle the application's configuration
-package config
+package config /* import "ivo.qa/jenxt/config" */
 
 import (
 	"encoding/json"
