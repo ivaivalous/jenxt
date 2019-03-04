@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io/ioutil"
-	"jenxt/config"
+	"ivo.qa/jenxt/config"
 	"path"
 	"regexp"
 	"strings"
