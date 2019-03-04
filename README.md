@@ -9,7 +9,16 @@ Normally, it is dangerous to let users run arbitrary scripts as they might take 
 
 # How to setup
 
-Installation is meant to be as easy as possible. You either build Jenxt from source with a simple `go build` or download a released executable. The choice of Go as a development language is exactly to make running Jenxt as easy as possible. No frameworks needed, or advanced setup.
+Installation is meant to be as easy as possible.
+
+```
+go get ivo.qa/jenxt
+cd ivo.qa/jenxt
+go build
+./jenxt
+```
+
+Or download a released executable. The choice of Go as a development language is exactly to make running Jenxt as easy as possible. No frameworks needed, or advanced setup.
 
 ```
 jenxt
