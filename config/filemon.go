@@ -1,4 +1,4 @@
-package config
+package config /* import "ivo.qa/jenxt/config" */
 
 import (
 	"crypto/sha1"
